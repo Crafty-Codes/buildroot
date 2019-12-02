@@ -14,7 +14,7 @@ This configuration uses U-Boot mainline and kernel mainline.
 How to build
 ============
 
-    $ make Bananapi_M2_Ultra_defconfig
+    $ make bananapi_m2_zero_defconfig
     $ make
 
 Note: you will need access to the internet to download the required

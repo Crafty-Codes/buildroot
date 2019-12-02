@@ -2,19 +2,21 @@ Intro
 =====
 
 This default configuration will allow you to start experimenting with the
-buildroot environment for the Bananapi M2 ULtra. With the current
-configuration it will bring-up the board, and allow access through the
-serial console.
+buildroot environment for the Bananapi M1. With the current configuration
+it will bring-up the board, and allow access through the serial console.
 
-Bananapi M2 Ultra link:
-http://www.banana-pi.org/m2u.html
+Bananapi M1 link:
+http://www.banana-pi.org/m1.html
+
+Wiki link:
+https://openedev.amarulasolutions.com/display/ODWIKI/Bananapi+M1
 
 This configuration uses U-Boot mainline and kernel mainline.
 
 How to build
 ============
 
-    $ make Bananapi_M2_Ultra_defconfig
+    $ make bananapi_m1_plus_defconfig
     $ make
 
 Note: you will need access to the internet to download the required
@@ -31,5 +33,5 @@ Copy the bootable "sdcard.img" onto an SD card with "dd":
   $ sudo dd if=output/images/sdcard.img of=/dev/sdX
   $ sudo sync
 
-Insert the micro SDcard in your Bananapi M2 Ultra and power it up. The console
+Insert the micro SDcard in your Bananapi M1 and power it up. The console
 is on the serial line, 115200 8N1.
