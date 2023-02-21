@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SCONS_VERSION = 3.1.0
+SCONS_VERSION = 3.1.2
 SCONS_SITE = http://downloads.sourceforge.net/project/scons/scons/$(SCONS_VERSION)
 SCONS_LICENSE = MIT
 SCONS_LICENSE_FILES = LICENSE.txt
@@ -16,4 +16,4 @@ HOST_SCONS_INSTALL_OPTS = \
 $(eval $(host-python-package))
 
 # variables used by other packages
-SCONS = $(HOST_DIR)/bin/scons $(if $(QUIET),-s)
+SCONS = $(HOST_DIR)/bin/python3 $(HOST_DIR)/bin/scons $(if $(QUIET),-s)

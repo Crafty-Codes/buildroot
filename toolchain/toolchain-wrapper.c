@@ -129,6 +129,8 @@ static const struct str_len_s unsafe_paths[] = {
 	STR_LEN(/usr/lib),
 	STR_LEN(/usr/local/include),
 	STR_LEN(/usr/local/lib),
+	STR_LEN(/usr/X11R6/include),
+	STR_LEN(/usr/X11R6/lib),
 	{ NULL, 0 },
 };
 
@@ -177,6 +179,7 @@ static void check_unsafe_path(const char *arg,
 	}
 }
 
+#ifdef BR_NEED_SOURCE_DATE_EPOCH
 /* Returns false if SOURCE_DATE_EPOCH was not defined in the environment.
  *
  * Returns true if SOURCE_DATE_EPOCH is in the environment and represent
@@ -230,6 +233,15 @@ bool parse_source_date_epoch_from_env(void)
 	}
 	return true;
 }
+#else
+bool parse_source_date_epoch_from_env(void)
+{
+	/* The compiler is recent enough to handle SOURCE_DATE_EPOCH itself
+	 * so we do not need to do anything here.
+	 */
+	return false;
+}
+#endif
 
 int main(int argc, char **argv)
 {
@@ -434,7 +446,7 @@ int main(int argc, char **argv)
 		/* Both args below can be set at compile/link time
 		 * and are ignored correctly when not used
 		 */
-		if(i == argc)
+		if (i == argc)
 			*cur++ = "-fPIE";
 
 		if (!found_shared)
@@ -495,8 +507,10 @@ int main(int argc, char **argv)
 
 	exec_args = args;
 #ifdef BR_CCACHE
-	if (getenv("BR_NO_CCACHE"))
-		/* Skip the ccache call */
+	/* If BR2_USE_CCACHE is not defined, or its value is not 1,
+	 * skip the ccache call */
+	char *br_use_ccache = getenv("BR2_USE_CCACHE");
+	if (!br_use_ccache || strncmp(br_use_ccache, "1", strlen("1")))
 		exec_args++;
 #endif
 

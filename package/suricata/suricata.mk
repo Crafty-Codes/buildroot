@@ -4,16 +4,19 @@
 #
 ################################################################################
 
-SURICATA_VERSION = 4.1.5
+SURICATA_VERSION = 6.0.6
 SURICATA_SITE = https://www.openinfosecfoundation.org/download
 SURICATA_LICENSE = GPL-2.0
 SURICATA_LICENSE_FILES = COPYING LICENSE
-# We're patching configure.ac
+SURICATA_CPE_ID_VENDOR = oisf
+# 0001-python-ensure-proper-shabang-on-python-scripts.patch
+# 0002-configure.ac-allow-the-user-to-override-RUST_TARGET.patch
 SURICATA_AUTORECONF = YES
 
 SURICATA_DEPENDENCIES = \
 	host-pkgconf \
-	$(if $(BR2_PACKAGE_JANSSON),jansson) \
+	host-rustc \
+	jansson \
 	$(if $(BR2_PACKAGE_LIBCAP_NG),libcap-ng) \
 	$(if $(BR2_PACKAGE_LIBEVENT),libevent) \
 	libhtp \
@@ -21,15 +24,17 @@ SURICATA_DEPENDENCIES = \
 	libpcap \
 	libyaml \
 	$(if $(BR2_PACKAGE_LZ4),lz4) \
-	$(if $(BR2_PACKAGE_LZMA),lzma) \
-	pcre
+	pcre \
+	$(if $(BR2_PACKAGE_XZ),xz)
 
-SURICATA_CONF_ENV = ac_cv_path_HAVE_SPHINXBUILD=no
+SURICATA_CONF_ENV = \
+	ac_cv_path_HAVE_SPHINXBUILD=no \
+	CARGO_HOME=$(HOST_DIR)/share/cargo \
+	RUST_TARGET=$(RUSTC_TARGET_NAME)
 
 SURICATA_CONF_OPTS = \
 	--disable-gccprotect \
 	--disable-pie \
-	--disable-rust \
 	--disable-suricata-update \
 	--enable-non-bundled-htp
 
@@ -39,6 +44,10 @@ SURICATA_CONF_OPTS = \
 #               download through wget/curl)
 SURICATA_INSTALL_TARGET_OPTS = DESTDIR=$(TARGET_DIR) install install-conf
 
+ifeq ($(BR2_TOOLCHAIN_HAS_LIBATOMIC),y)
+SURICATA_CONF_ENV += LIBS=-latomic
+endif
+
 ifeq ($(BR2_PACKAGE_FILE),y)
 SURICATA_DEPENDENCIES += file
 SURICATA_CONF_OPTS += --enable-libmagic
@@ -46,19 +55,9 @@ else
 SURICATA_CONF_OPTS += --disable-libmagic
 endif
 
-# --disable-libgeoip disables libgeoip when --enable-geoip is requested.
-# This allows libmaxminddb to be picked up instead of libgeoip when both are
-# installed on the system.
 ifeq ($(BR2_PACKAGE_LIBMAXMINDDB),y)
 SURICATA_DEPENDENCIES += libmaxminddb
-SURICATA_CONF_OPTS += \
-	--enable-geoip \
-	--disable-libgeoip
-else ifeq ($(BR2_PACKAGE_GEOIP),y)
-SURICATA_DEPENDENCIES += geoip
-SURICATA_CONF_OPTS += \
-	--enable-geoip \
-	--enable-libgeoip
+SURICATA_CONF_OPTS += --enable-geoip
 else
 SURICATA_CONF_OPTS += --disable-geoip
 endif
@@ -117,9 +116,9 @@ else
 SURICATA_CONF_OPTS += --disable-luajit
 endif
 
-ifeq ($(BR2_PACKAGE_PYTHON)$(BR2_PACKAGE_PYTHON3),y)
+ifeq ($(BR2_PACKAGE_PYTHON3),y)
 SURICATA_CONF_OPTS += --enable-python
-SURICATA_DEPENDENCIES += $(if $(BR2_PACKAGE_PYTHON),python,python3)
+SURICATA_DEPENDENCIES += python3
 else
 SURICATA_CONF_OPTS += --disable-python
 endif
@@ -132,9 +131,6 @@ endef
 define SURICATA_INSTALL_INIT_SYSTEMD
 	$(INSTALL) -D -m 644 package/suricata/suricata.service \
 		$(TARGET_DIR)/usr/lib/systemd/system/suricata.service
-	mkdir -p $(TARGET_DIR)/etc/systemd/system/multi-user.target.wants
-	ln -sf ../../../../usr/lib/systemd/system/suricata.service \
-		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/suricata.service
 endef
 
 $(eval $(autotools-package))

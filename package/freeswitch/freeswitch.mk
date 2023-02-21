@@ -4,26 +4,22 @@
 #
 ################################################################################
 
-FREESWITCH_VERSION = 1.10.1
+FREESWITCH_VERSION = 1.10.8
 FREESWITCH_SOURCE = freeswitch-$(FREESWITCH_VERSION).-release.tar.xz
 FREESWITCH_SITE = https://files.freeswitch.org/freeswitch-releases
 # External modules need headers/libs from staging
 FREESWITCH_INSTALL_STAGING = YES
 FREESWITCH_LICENSE = MPL-1.1, \
 	GPL-3.0+ with font exception (fonts), \
-	Apache-2.0 (apr, apr-util), \
-	LGPL-2.0+ (sofia-sip), \
-	LGPL-2.1, GPL-2.0 (spandsp), \
+	Apache-2.0 (apr), \
 	BSD-3-Clause (libsrtp)
 
 FREESWITCH_LICENSE_FILES = \
 	COPYING \
 	libs/apr/LICENSE \
-	libs/apr-util/LICENSE \
-	libs/sofia-sip/COPYING \
-	libs/sofia-sip/COPYRIGHTS \
-	libs/spandsp/COPYING \
 	libs/srtp/LICENSE
+
+FREESWITCH_CPE_ID_VENDOR = freeswitch
 
 # required dependencies
 FREESWITCH_DEPENDENCIES = \
@@ -32,6 +28,8 @@ FREESWITCH_DEPENDENCIES = \
 	libcurl \
 	openssl \
 	pcre \
+	spandsp \
+	sofia-sip \
 	speex \
 	sqlite \
 	tiff \
@@ -50,6 +48,10 @@ FREESWITCH_CONF_ENV += \
 	ac_cv_have_php=no \
 	ac_cv_prog_PHP_CONFIG=false \
 	ac_cv_have_php_config=no
+
+# disable pcap detection, pcap is an optional dependency for unit tests
+FREESWITCH_CONF_ENV += \
+	ac_cv_prog_HAVE_PCAP_CONFIG=false
 
 # copied from freeswitch/configure.ac, line 258+
 FREESWITCH_CONF_ENV += \
@@ -81,7 +83,7 @@ FREESWITCH_CONF_OPTS = \
 
 # zrtp supports a limited set of archs, sparc support is also broken due
 # to a broken ld call by gcc, see libs/libzrtp/include/zrtp_config.h
-ifeq ($(BR2_i386)$(BR2_arm)$(BR2_armeb)$(BR2_aarch64)$(BR2_aarch64_be)$(BR2_mips)$(BR2_mipsel)$(BR2_mips64)$(BR2_mips64el)$(BR2_powerpc)$(BR2_powerpc64)$(BR2_powerpcle)$(BR2_x86_64),y)
+ifeq ($(BR2_i386)$(BR2_arm)$(BR2_armeb)$(BR2_aarch64)$(BR2_aarch64_be)$(BR2_mips)$(BR2_mipsel)$(BR2_mips64)$(BR2_mips64el)$(BR2_powerpc)$(BR2_powerpc64)$(BR2_powerpc64le)$(BR2_x86_64),y)
 FREESWITCH_LICENSE_FILES += libs/libzrtp/src/zrtp_legal.c
 FREESWITCH_CONF_OPTS += --enable-zrtp
 else
@@ -121,7 +123,6 @@ FREESWITCH_ENABLED_MODULES += \
 	endpoints/mod_rtc \
 	endpoints/mod_rtmp \
 	endpoints/mod_sofia \
-	endpoints/mod_verto \
 	event_handlers/mod_cdr_csv \
 	event_handlers/mod_cdr_sqlite \
 	event_handlers/mod_event_socket \
@@ -210,6 +211,11 @@ FREESWITCH_DEPENDENCIES += libilbc
 FREESWITCH_ENABLED_MODULES += codecs/mod_ilbc
 endif
 
+ifeq ($(BR2_PACKAGE_LIBKS),y)
+FREESWITCH_DEPENDENCIES += libks
+FREESWITCH_ENABLED_MODULES += endpoints/mod_verto
+endif
+
 ifeq ($(BR2_PACKAGE_LIBLDNS),y)
 FREESWITCH_DEPENDENCIES += libldns
 FREESWITCH_ENABLED_MODULES += applications/mod_enum
@@ -277,8 +283,8 @@ FREESWITCH_DEPENDENCIES += libsoundtouch
 FREESWITCH_ENABLED_MODULES += applications/mod_soundtouch
 endif
 
-ifeq ($(BR2_PACKAGE_OPENCV),y)
-FREESWITCH_DEPENDENCIES += opencv
+ifeq ($(BR2_PACKAGE_OPENCV3),y)
+FREESWITCH_DEPENDENCIES += opencv3
 FREESWITCH_ENABLED_MODULES += applications/mod_cv
 endif
 
@@ -309,6 +315,39 @@ FREESWITCH_CONF_OPTS += --enable-libvpx --enable-libyuv
 FREESWITCH_DEPENDENCIES += host-yasm ffmpeg
 FREESWITCH_ENABLED_MODULES += applications/mod_av applications/mod_fsv
 FREESWITCH_MAKE_ENV += CROSS=$(TARGET_CROSS)
+
+# Freeswitch's buildsystem forgets to pass important environment
+# variables and config options when it configures libvpx, so
+# pre-build libvpx manually, so Freeswitch does not attempt to run
+# its flawed commands...
+# Freeswitch only ever uses the static libtrary, that's hard-coded,
+# we can't do anything about that...
+# From package/libvpx/libvpx.mk:
+# - this is not a true autotools package.  It is based on the ffmpeg
+#   build system.
+# - ld is being used with cc options. therefore, pretend ld is cc.
+define FREESWITCH_BUILD_LIBVPX
+	cd $(@D)/libs/libvpx && \
+	$(TARGET_CONFIGURE_OPTS) \
+	$(TARGET_CONFIGURE_ARGS) \
+	LD="$(TARGET_CC)" \
+	CROSS=$(GNU_TARGET_NAME) \
+	./configure \
+		--target=generic-gnu \
+		--enable-pic \
+		--prefix=/usr \
+		--disable-shared --enable-static \
+		--disable-examples \
+		--disable-docs \
+		--disable-unit-tests && \
+	$(TARGET_MAKE_ENV) \
+	$(LIBVPX_MAKE_ENV) \
+	$(MAKE) \
+		-C $(@D)/libs/libvpx \
+		all
+endef
+FREESWITCH_PRE_BUILD_HOOKS += FREESWITCH_BUILD_LIBVPX
+
 else
 FREESWITCH_CONF_OPTS += --disable-libvpx --disable-libyuv
 endif

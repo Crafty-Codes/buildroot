@@ -1,5 +1,5 @@
-# From https://lists.xapian.org/pipermail/xapian-discuss/2019-October/009764.html
-sha256 93f8ffffa80c5e6036befbf356f34456cc18c2f745cef85e9b4cfc254042137c xapian-core-1.4.13.tar.xz
+# From https://lists.xapian.org/pipermail/xapian-discuss/2022-January/009934.html
+sha256  1fca48fca6cc3526cc4ba93dd194fe9c1326857b78edcfb37e68d086d714a9c3  xapian-core-1.4.19.tar.xz
 
 # locally computed
-sha256 c38aee9e3c8c4d5d594ff548a1be05453023016d6286931f6512db215ec1fd42 COPYING
+sha256  c38aee9e3c8c4d5d594ff548a1be05453023016d6286931f6512db215ec1fd42  COPYING

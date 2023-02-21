@@ -10,6 +10,7 @@ ZIP_SOURCE = zip$(subst .,,$(ZIP_VERSION)).tgz
 ZIP_SITE = ftp://ftp.info-zip.org/pub/infozip/src
 ZIP_LICENSE = Info-ZIP
 ZIP_LICENSE_FILES = LICENSE
+ZIP_CPE_ID_VENDOR = info-zip_project
 
 ifeq ($(BR2_PACKAGE_BZIP2),y)
 ZIP_DEPENDENCIES += bzip2

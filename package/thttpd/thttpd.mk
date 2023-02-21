@@ -8,6 +8,7 @@ THTTPD_VERSION = 2.29
 THTTPD_SITE = https://acme.com/software/thttpd
 THTTPD_LICENSE = BSD-2-Clause
 THTTPD_LICENSE_FILES = thttpd.c
+THTTPD_CPE_ID_VENDOR = acme
 
 THTTPD_MAKE = $(MAKE1)
 
@@ -36,9 +37,6 @@ endef
 define THTTPD_INSTALL_INIT_SYSTEMD
 	$(INSTALL) -D -m 0644 package/thttpd/thttpd.service \
 		$(TARGET_DIR)/usr/lib/systemd/system/thttpd.service
-	mkdir -p $(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/
-	ln -fs ../../../../usr/lib/systemd/system/thttpd.service \
-		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/thttpd.service
 endef
 
 $(eval $(autotools-package))

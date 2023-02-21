@@ -1,3 +1,5 @@
 # md5, sha256 from https://pypi.org/pypi/bluezero/json
-md5	b13fd84a5fe98ce9526a6f513c9131b1  bluezero-0.2.0.tar.gz
-sha256	d16eb9ac048665a974ad0db312b23bfd528423000b7b2983566b853d5e0d19b6  bluezero-0.2.0.tar.gz
+md5  b26e6425d8adc4613b7cdf1d131f8c0b  bluezero-0.6.0.tar.gz
+sha256  d94f0672b1de3ff0040801538143fe9a42c501d8db79bcd183c9e051b8da83bc  bluezero-0.6.0.tar.gz
+# Locally computed sha256 checksums
+sha256  59319e80b4caa94ace4817c9f84aa16abc9d4d2b5f7866251b5fda92e87ccdef  LICENSE

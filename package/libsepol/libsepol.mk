@@ -4,14 +4,15 @@
 #
 ################################################################################
 
-LIBSEPOL_VERSION = 2.9
-LIBSEPOL_SITE = https://github.com/SELinuxProject/selinux/releases/download/20190315
+LIBSEPOL_VERSION = 3.3
+LIBSEPOL_SITE = https://github.com/SELinuxProject/selinux/releases/download/$(LIBSEPOL_VERSION)
 LIBSEPOL_LICENSE = LGPL-2.1+
 LIBSEPOL_LICENSE_FILES = COPYING
+LIBSEPOL_CPE_ID_VENDOR = selinuxproject
 
 LIBSEPOL_INSTALL_STAGING = YES
 LIBSEPOL_DEPENDENCIES = host-flex
-HOST_LIBSEPOL_DEPENDENCIES = host-flex
+HOST_LIBSEPOL_DEPENDENCIES = $(BR2_COREUTILS_HOST_DEPENDENCY) host-flex
 
 LIBSEPOL_MAKE_FLAGS = $(TARGET_CONFIGURE_OPTS)
 

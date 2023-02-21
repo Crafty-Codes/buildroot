@@ -1,3 +1,5 @@
-# Locally calculated
-sha256 c8557b6df5f5cdf67b3ddf6fe501cfc6e0be698f175f16927dd08d6040df7d9f  bitcoin-0.16.3.tar.gz
-sha256 70223369f70e8cb550e75aa74eb86bfa5220fb09c0ba0549d91c36587d15d1a0  COPYING
+# From https://bitcoincore.org/bin/bitcoin-core-0.21.2/SHA256SUMS.asc
+sha256  4146f751fc5691bdcf911cbdb8d32d8d25c297d29d58173227ae1ae6438edb9e  bitcoin-0.21.2.tar.gz
+
+# Hash for license file
+sha256  96fe807030b21f88305adc32af62f9aa19915f2783509fd6f52aea02cf83f644  COPYING

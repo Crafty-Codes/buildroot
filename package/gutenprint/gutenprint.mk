@@ -10,9 +10,17 @@ GUTENPRINT_SITE = http://downloads.sourceforge.net/project/gimp-print/gutenprint
 GUTENPRINT_SOURCE = gutenprint-$(GUTENPRINT_VERSION).tar.bz2
 GUTENPRINT_LICENSE = GPL-2.0+
 GUTENPRINT_LICENSE_FILES = COPYING
+GUTENPRINT_CPE_ID_VENDOR = gutenprint_project
 
 # Needed, as we touch Makefile.am
 GUTENPRINT_AUTORECONF = YES
+
+# Needed by autoreconf
+define GUTENPRINT_CREATE_M4_DIR
+	mkdir -p $(@D)/m4local
+endef
+GUTENPRINT_POST_PATCH_HOOKS += GUTENPRINT_CREATE_M4_DIR
+HOST_GUTENPRINT_POST_PATCH_HOOKS += GUTENPRINT_CREATE_M4_DIR
 
 GUTENPRINT_DEPENDENCIES = \
 	cups host-pkgconf \
@@ -65,13 +73,6 @@ HOST_GUTENPRINT_CONF_OPTS = \
 	--disable-test \
 	--disable-testpattern \
 	--without-cups
-
-# Needed by autoreconf
-define GUTENPRINT_CREATE_M4_DIR
-	mkdir -p $(@D)/m4local
-endef
-GUTENPRINT_POST_PATCH_HOOKS += GUTENPRINT_CREATE_M4_DIR
-HOST_GUTENPRINT_POST_PATCH_HOOKS += GUTENPRINT_CREATE_M4_DIR
 
 define HOST_GUTENPRINT_POST_BUILD_INSTAL_TMP_HEADER
 	cp $(@D)/src/xml/xmli18n-tmp.h $(HOST_DIR)/include

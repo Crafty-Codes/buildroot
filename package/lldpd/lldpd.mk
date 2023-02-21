@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-LLDPD_VERSION = 1.0.4
-LLDPD_SITE = http://media.luffy.cx/files/lldpd
+LLDPD_VERSION = 1.0.15
+LLDPD_SITE = https://media.luffy.cx/files/lldpd
 LLDPD_DEPENDENCIES = \
 	$(if $(BR2_PACKAGE_CHECK),check) \
 	host-pkgconf \
@@ -14,6 +14,7 @@ LLDPD_DEPENDENCIES = \
 	$(if $(BR2_PACKAGE_VALGRIND),valgrind)
 LLDPD_LICENSE = ISC
 LLDPD_LICENSE_FILES = LICENSE
+LLDPD_CPE_ID_VENDOR = lldpd_project
 
 # Detection of c99 support in configure fails without WCHAR. To enable
 # automatic detection of c99 support by configure, we need to enable
@@ -63,12 +64,6 @@ endif
 define LLDPD_INSTALL_INIT_SYSV
 	$(INSTALL) -D -m 0755 package/lldpd/S60lldpd \
 		$(TARGET_DIR)/etc/init.d/S60lldpd
-endef
-
-define LLDPD_INSTALL_INIT_SYSTEMD
-	mkdir -p $(TARGET_DIR)/etc/systemd/system/multi-user.target.wants
-	ln -sf ../../../../usr/lib/systemd/system/lldpd.service \
-		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/lldpd.service
 endef
 
 $(eval $(autotools-package))
