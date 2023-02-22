@@ -7,3 +7,5 @@ RUN apt-get update && apt-get install -y \
     libncurses-dev bison flex libssl-dev libelf-dev
 
 COPY . /buildroot
+
+RUN git config --global --add safe.directory /buildroot
